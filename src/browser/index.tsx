@@ -26,6 +26,13 @@
  * ```
  */
 
-import { main } from "./browser";
+import React from "react";
+import { render } from "react-dom";
+import { App } from "./App";
 
-main();
+export function main() {
+    render(
+        <App/>,
+        document.getElementById('root')
+    );
+}
