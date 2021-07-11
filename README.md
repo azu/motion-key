@@ -80,7 +80,7 @@ module.exports = ({ type, activeWindow, payload }) => {
 }
 ```
 
-You can set `key for each Gesture:
+You can set `key` for each Gesture:
 
 ```js
 module.exports = ({ type, activeWindow, payload }) => {
