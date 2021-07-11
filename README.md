@@ -121,6 +121,40 @@ module.exports = ({ type, activeWindow, payload }) => {
 
 For more details, see [Config.ts](src/main/Config.ts).
 
+### Recipe
+
+Only work on Kindle.app
+
+```js
+const kindle = ({ type, payload }) => {
+    if (type === "PixelChangeAction") {
+        // large motion to next page
+        if (payload.diffPercent < 10) {
+            return;
+        }
+        return {
+            key: "Space"
+        }
+    } else if (type === "GestureAction") {
+        // 👍 next page
+        if (payload.type === "👍") {
+            return { key: "Space" }
+        }
+        // ✌️ prev page
+        if (payload.type === "✌️") {
+            return { key: "Space", modifier: { "shift": true } }
+        }
+    }
+};
+
+module.exports = ({ type, activeWindow, payload }) => {
+    const bundleId = activeWindow?.owner?.bundleId;
+    if (bundleId === "com.amazon.Kindle") {
+        return kindle({ type, payload })
+    }
+}
+```
+
 ## Contributing
 
 1. Fork it!

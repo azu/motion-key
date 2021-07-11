@@ -33,11 +33,12 @@ export function sendKeyStroke(key: string, modifierOption: ModifierOption) {
             const app = Application.currentApplication();
             app.includeStandardAdditions = true;
             /*
-        key code 123 -- left arrow
-        key code 124 -- right arrow
-        key code 125 -- down arrow
-        key code 126 -- up arrow
-         */
+             * key code 123 -- left arrow
+             * key code 124 -- right arrow
+             * key code 125 -- down arrow
+             * key code 126 -- up arrow
+             * key code 49 -- space
+             */
             if (key === "ArrowLeft") {
                 SystemEvents.keyCode(123, { using: modifiers });
             } else if (key === "ArrowRight") {
@@ -46,6 +47,8 @@ export function sendKeyStroke(key: string, modifierOption: ModifierOption) {
                 SystemEvents.keyCode(125, { using: modifiers });
             } else if (key === "ArrowUp") {
                 SystemEvents.keyCode(126, { using: modifiers });
+            } else if (key === "Space") {
+                SystemEvents.keyCode(49, { using: modifiers });
             } else {
                 SystemEvents.keystroke(key, { using: modifiers });
             }
