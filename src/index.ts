@@ -101,8 +101,8 @@ const createWindow = (): void => {
         if (!config) {
             return;
         }
-        if (config.throttleMs !== undefined) {
-            waitTimeMs = config.throttleMs;
+        if (config.nextActionIntervalMs !== undefined) {
+            waitTimeMs = config.nextActionIntervalMs;
         }
         console.info("config", config);
         sendKeyStroke(config.key, config.modifier ?? {});
@@ -124,8 +124,8 @@ const createWindow = (): void => {
         if (!config) {
             return;
         }
-        if (config.throttleMs !== undefined) {
-            waitTimeMs = config.throttleMs;
+        if (config.nextActionIntervalMs !== undefined) {
+            waitTimeMs = config.nextActionIntervalMs;
         }
         console.info("config", config);
         sendKeyStroke(config.key, config.modifier ?? {});

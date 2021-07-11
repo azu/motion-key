@@ -7,7 +7,7 @@ import { ActionMap } from "../shared/messge";
 export type UserConfig = {
     key: string;
     modifier?: ModifierOption;
-    throttleMs?: number;
+    nextActionIntervalMs?: number;
 };
 export type UserConfigCreatorArgs<T extends keyof ActionMap> = {
     type: T;
