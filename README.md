@@ -24,7 +24,31 @@ A key config app for your motion.
 
 You can write config file in `~/.config/motion-key/motion-key.config.js`.
 
-Example: `~/.config/motion-key/motion-key.config.js`:
+Config location:
+
+- `~/.config/motion-key/motion-key.config.js`
+
+You can control reaction for pixel diffs:
+
+```js
+module.exports = ({ type, activeWindow, payload }) => {
+    if (type === "PixelChangeAction") {
+        // ignore diffs less than 5% of capture
+        if (payload.diffPercent < 5) {
+            return;
+        }
+        return {
+            key: "ArrowDown"
+        };
+    } else if (type === "GestureAction") {
+        return {
+            key: "ArrowUp"
+        };
+    }
+}
+```
+
+You can change the config for each application:
 
 ```js
 const muPdf = ({ type }) => {
@@ -51,28 +75,6 @@ module.exports = ({ type, activeWindow, payload }) => {
     } else if (type === "GestureAction") {
         return {
             key: "ArrowUp"
-        }
-    }
-}
-```
-
-You can control reaction for pixel diffs:
-
-```js
-module.exports = ({ type, activeWindow, payload }) => {
-    if (type === "PixelChangeAction") {
-        // ignore diffs less than 5% of capture
-        if (payload.diffPercent < 5) {
-            return;
-        }
-        return {
-            key: "ArrowDown",
-            nextActionIntervalMs: 5 * 1000
-        }
-    } else if (type === "GestureAction") {
-        return {
-            key: "ArrowUp",
-            nextActionIntervalMs: 5 * 1000
         }
     }
 }
