@@ -1,5 +1,7 @@
-export type Action = PixelChangeAction;
-export type PixelChangeAction = {
-    type: "PixelChangeAction",
-    data: { diffPixelCount: number; diffPercent: number }
-};
+import type { GestureDetectionType } from "../browser/MotionVideo";
+
+export type ActionMap = {
+    "PixelChangeAction": { diffPixelCount: number; diffPercent: number }
+    "GestureAction": { type: GestureDetectionType }
+}
+

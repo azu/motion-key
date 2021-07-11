@@ -1,16 +1,17 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from "electron";
-import { Action } from "../shared/messge";
+import type { ActionMap } from "../shared/messge";
+
+const API_KEY = "api";
 
 /**
  * APIクラス
  */
 export class ContextBridgeApi {
-    public static readonly API_KEY = "api";
-    public sendToMainProcess = (action: Action) => {
-        return ipcRenderer.invoke(action.type, action);
+    public sendToMainProcess = <T extends keyof ActionMap>(key: T, data: ActionMap[T]) => {
+        return ipcRenderer.invoke(key, data);
     };
 
-    public onSendToRenderer = <T extends Action>(type: T["type"], handler: (event: IpcRendererEvent, data: T["data"]) => unknown) => {
+    public onSendToRenderer = <T extends keyof ActionMap>(type: T, handler: (event: IpcRendererEvent, data: ActionMap[T]) => unknown) => {
         return ipcRenderer.on(type, handler)
     };
 }
@@ -19,6 +20,6 @@ export class ContextBridgeApi {
  * contextBridgeにAPIを登録する。
  */
 contextBridge.exposeInMainWorld(
-    ContextBridgeApi.API_KEY,
+    API_KEY,
     new ContextBridgeApi()
 );

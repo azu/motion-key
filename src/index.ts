@@ -1,7 +1,12 @@
-import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron';
-import { Action } from './shared/messge';
+import { app, BrowserWindow, ipcMain } from 'electron';
+import { ActionMap } from './shared/messge';
 import { sendKeyStroke } from "./main/sendKeyStroke";
 import { throttle } from 'throttle-typescript';
+import path from "path";
+import activeWin from "active-win";
+import fs from "fs";
+import { CreateConfig } from "./main/Config";
+
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
@@ -9,16 +14,68 @@ declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
     app.quit();
 }
-
-const onMessage = <T extends Action>(type: T["type"], handler: (event: IpcMainInvokeEvent, data: T["data"]) => unknown) => {
-    return ipcMain.handle(type, (event, args) => handler(event, args["data"]))
+const onMessage = <T extends keyof ActionMap>(type: T, handler: (data: ActionMap[T]) => unknown) => {
+    return ipcMain.handle(type, (event, args) => handler(args))
 }
+const getUserConfigFile = (): string | undefined => {
+    try {
+        const homedir = app.getPath("home");
+        const userConfigPathList = path.join(homedir, ".config/motion-key/motion-key.config.js");
+        return fs.existsSync(userConfigPathList) ? userConfigPathList : undefined;
+    } catch {
+        return undefined;
+    }
+};
+const DEFAULT_CREATE_CONFIG: CreateConfig = ({
+                                                 type,
+                                                 payload
+                                             }) => {
+    if (type === "PixelChangeAction") {
+        if ((payload as ActionMap["PixelChangeAction"]).diffPercent < 3) {
+            return
+        }
+        return {
+            key: "ArrowDown"
+        }
+    } else if (type === "GestureAction") {
+        return {
+            key: "ArrowUp"
+        }
+    }
+};
 
+const getConfig = async <T extends keyof ActionMap>({
+                                                        type,
+                                                        payload
+                                                    }: { type: T, payload: ActionMap[T] }) => {
+    try {
+        const activeWindow = await activeWin.sync();
+        if (!activeWindow) {
+            console.error(new Error("Not found active window"));
+            return;
+        }
+        const userConfigPath = getUserConfigFile();
+        const userConfig: CreateConfig = typeof userConfigPath === "string" ? eval(`require("${userConfigPath}")`) : DEFAULT_CREATE_CONFIG;
+        if (!userConfig) {
+            return;
+        }
+        return userConfig({
+            type,
+            payload,
+            path,
+            app,
+            activeWindow
+        });
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+}
 const createWindow = (): void => {
     // Create the browser window.
     const mainWindow = new BrowserWindow({
-        height: 600,
-        width: 800,
+        height: 800,
+        width: 1024,
         webPreferences: {
             preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
             contextIsolation: true,
@@ -31,13 +88,49 @@ const createWindow = (): void => {
 
     // Open the DevTools.
     mainWindow.webContents.openDevTools();
-
-    const sendKeyStrokeThrottle = throttle(sendKeyStroke, 1000);
-    onMessage("PixelChangeAction", (event, data) => {
-        console.log("diff: ", data);
-        if (data.diffPixelCount > 5000) {
-            sendKeyStrokeThrottle("j", {});
+    let prevTimeMs = Date.now()
+    let waitTimeMs = 1_000; // 1sec
+    onMessage("PixelChangeAction", async (data) => {
+        const currentTimeMs = Date.now();
+        if (currentTimeMs - prevTimeMs < waitTimeMs) {
+            console.info("Skip by waiting: PixelChangeAction", data)
+            return;
         }
+        prevTimeMs = currentTimeMs;
+        console.info("PixelChangeAction", data);
+        const config = await getConfig({
+            type: "PixelChangeAction",
+            payload: data
+        });
+        if (!config) {
+            return;
+        }
+        if (config.throttleMs !== undefined) {
+            waitTimeMs = config.throttleMs;
+        }
+        sendKeyStroke(config.key, config.modifier ?? {});
+        // sendKeyStrokeThrottle("j", {});
+    });
+    onMessage("GestureAction", async (data) => {
+        console.info("GestureAction", data);
+        const currentTimeMs = performance.now();
+        if (currentTimeMs - prevTimeMs < waitTimeMs) {
+            console.info("Skip by waiting: GestureAction", data)
+            return;
+        }
+        prevTimeMs = currentTimeMs;
+        console.info("GestureAction", data)
+        const config = await getConfig({
+            type: "GestureAction",
+            payload: data
+        });
+        if (!config) {
+            return;
+        }
+        if (config.throttleMs !== undefined) {
+            waitTimeMs = config.throttleMs;
+        }
+        sendKeyStroke(config.key, config.modifier ?? {});
     });
 };
 
