@@ -244,17 +244,21 @@ export const MotionVideo = (props: MotionVideoProps) => {
     const [{ devices, selectedDeviceId }, { handleSelectDevice }] = useMotionVideo({ videoRef });
     return (
         <div>
-            <Listbox value={selectedDeviceId} onChange={handleSelectDevice}>
-                <Listbox.Button>{"device"}</Listbox.Button>
-                <Listbox.Options>
-                    {devices?.map((device) => (
-                        <Listbox.Option key={device.deviceId} value={device.deviceId}>
-                            {device.label}
-                        </Listbox.Option>
-                    ))}
-                </Listbox.Options>
-            </Listbox>
-            <video ref={videoRef} width={VIDEO_CONFIG.video.width} height={VIDEO_CONFIG.video.height}></video>
+            <div>
+                <Listbox value={selectedDeviceId} onChange={handleSelectDevice}>
+                    <Listbox.Button>{"device"}</Listbox.Button>
+                    <Listbox.Options>
+                        {devices?.map((device) => (
+                            <Listbox.Option key={device.deviceId} value={device.deviceId}>
+                                {device.label}
+                            </Listbox.Option>
+                        ))}
+                    </Listbox.Options>
+                </Listbox>
+            </div>
+            <div>
+                <video ref={videoRef} width={VIDEO_CONFIG.video.width} height={VIDEO_CONFIG.video.height}></video>
+            </div>
             <canvas ref={canvasRef} hidden={true} />
             <canvas ref={poseCanvasRef} hidden={true} />
         </div>
