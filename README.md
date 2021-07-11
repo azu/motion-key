@@ -1,6 +1,6 @@
 # motion-key
 
-A key config app for your motion.
+A keyboard configuration for your motion.
 
 ## Requirements
 
