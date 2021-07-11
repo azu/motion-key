@@ -37,8 +37,19 @@ const gestureStrings = {
     victory: "✌️"
 };
 export type GestureDetectionType = "👍" | "✌️";
+const loadModel = (() => {
+    let cache: null | any = null;
+    return async () => {
+        if (cache) {
+            return cache;
+        }
+        const model = await handpose.load();
+        cache = model;
+        return model;
+    };
+})();
 const estimateHands = async (video: HTMLVideoElement): Promise<GestureDetectionType | null> => {
-    const model = await handpose.load();
+    const model = await loadModel();
     // get hand landmarks from video
     // Note: Handpose currently only detects one hand at a time
     // Therefore the maximum number of predictions is 1
