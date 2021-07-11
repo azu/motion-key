@@ -108,6 +108,7 @@ const createWindow = (): void => {
         if (config.throttleMs !== undefined) {
             waitTimeMs = config.throttleMs;
         }
+        console.info("config", config);
         sendKeyStroke(config.key, config.modifier ?? {});
         // sendKeyStrokeThrottle("j", {});
     });
@@ -130,6 +131,7 @@ const createWindow = (): void => {
         if (config.throttleMs !== undefined) {
             waitTimeMs = config.throttleMs;
         }
+        console.info("config", config);
         sendKeyStroke(config.key, config.modifier ?? {});
     });
 };
