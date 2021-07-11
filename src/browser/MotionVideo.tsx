@@ -50,7 +50,6 @@ const estimateHands = async (video: HTMLVideoElement): Promise<GestureDetectionT
         // now estimate gestures based on landmarks
         // using a minimum confidence of 7.5 (out of 10)
         const est = GE.estimate(predictions[i].landmarks, 7.5);
-        console.log("est", est);
         if (est.gestures.length > 0) {
             // find gesture with highest confidence
             const result = est.gestures.reduce((p: any, c: any) => {
@@ -212,7 +211,6 @@ export const useMotionVideo = ({ videoRef }: { videoRef: MutableRefObject<HTMLVi
                 console.warn("No selected device");
                 return;
             }
-            console.log("selectedDevice", selectedDeviceId);
             const mediaStream = await getMediaStream(selectedDeviceId);
             setMediaStream(mediaStream);
         })()

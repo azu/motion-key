@@ -113,7 +113,7 @@ const createWindow = (): void => {
     });
     onMessage("GestureAction", async (data) => {
         console.info("GestureAction", data);
-        const currentTimeMs = performance.now();
+        const currentTimeMs = Date.now();
         if (currentTimeMs - prevTimeMs < waitTimeMs) {
             console.info("Skip by waiting: GestureAction", data)
             return;
