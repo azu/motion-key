@@ -80,6 +80,25 @@ module.exports = ({ type, activeWindow, payload }) => {
 }
 ```
 
+You can set `key for each Gesture:
+
+```js
+module.exports = ({ type, activeWindow, payload }) => {
+    if (type === "PixelChangeAction") {
+        return {
+            key: "ArrowDown"
+        }
+    } else if (type === "GestureAction") {
+        if (payload.type === "👍") {
+            return { key: "ArrowUp" }
+        }
+        if (payload.type === "✌️") {
+            return { key: "ArrowRight" }
+        }
+    }
+}
+```
+
 You can set `nextActionIntervalMs` to throttle keys.
 
 motion-key ignore actions until the passage of `nextActionIntervalMs`.
