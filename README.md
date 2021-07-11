@@ -56,6 +56,28 @@ module.exports = ({ type, activeWindow, payload }) => {
 }
 ```
 
+You can control reaction for pixel diffs:
+
+```js
+module.exports = ({ type, activeWindow, payload }) => {
+    if (type === "PixelChangeAction") {
+        // ignore diffs less than 5% of capture
+        if (payload.diffPercent < 5) {
+            return;
+        }
+        return {
+            key: "ArrowDown",
+            nextActionIntervalMs: 5 * 1000
+        }
+    } else if (type === "GestureAction") {
+        return {
+            key: "ArrowUp",
+            nextActionIntervalMs: 5 * 1000
+        }
+    }
+}
+```
+
 You can set `nextActionIntervalMs` to throttle keys.
 
 motion-key ignore actions until the passage of `nextActionIntervalMs`.
