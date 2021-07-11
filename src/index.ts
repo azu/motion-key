@@ -92,7 +92,6 @@ const createWindow = (): void => {
             console.info("Skip by waiting: PixelChangeAction", data);
             return;
         }
-        prevTimeMs = currentTimeMs;
         console.info("PixelChangeAction", data);
         const config = await getConfig({
             type: "PixelChangeAction",
@@ -104,9 +103,9 @@ const createWindow = (): void => {
         if (config.nextActionIntervalMs !== undefined) {
             waitTimeMs = config.nextActionIntervalMs;
         }
-        console.info("config", config);
+        console.info("input config", config);
         sendKeyStroke(config.key, config.modifier ?? {});
-        // sendKeyStrokeThrottle("j", {});
+        prevTimeMs = currentTimeMs;
     });
     onMessage("GestureAction", async (data) => {
         console.info("GestureAction", data);
@@ -115,7 +114,6 @@ const createWindow = (): void => {
             console.info("Skip by waiting: GestureAction", data);
             return;
         }
-        prevTimeMs = currentTimeMs;
         console.info("GestureAction", data);
         const config = await getConfig({
             type: "GestureAction",
@@ -127,8 +125,9 @@ const createWindow = (): void => {
         if (config.nextActionIntervalMs !== undefined) {
             waitTimeMs = config.nextActionIntervalMs;
         }
-        console.info("config", config);
+        console.info("input config", config);
         sendKeyStroke(config.key, config.modifier ?? {});
+        prevTimeMs = currentTimeMs;
     });
 };
 
