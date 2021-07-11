@@ -1,7 +1,7 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
-import { ActionMap } from './shared/messge';
+import { app, BrowserWindow, ipcMain } from "electron";
+import { ActionMap } from "./shared/messge";
 import { sendKeyStroke } from "./main/sendKeyStroke";
-import { throttle } from 'throttle-typescript';
+import { throttle } from "throttle-typescript";
 import path from "path";
 import activeWin from "active-win";
 import fs from "fs";
@@ -11,12 +11,13 @@ declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
+if (require("electron-squirrel-startup")) {
+    // eslint-disable-line global-require
     app.quit();
 }
 const onMessage = <T extends keyof ActionMap>(type: T, handler: (data: ActionMap[T]) => unknown) => {
-    return ipcMain.handle(type, (event, args) => handler(args))
-}
+    return ipcMain.handle(type, (event, args) => handler(args));
+};
 const getUserConfigFile = (): string | undefined => {
     try {
         const homedir = app.getPath("home");
@@ -26,28 +27,22 @@ const getUserConfigFile = (): string | undefined => {
         return undefined;
     }
 };
-const DEFAULT_CREATE_CONFIG: CreateConfig = ({
-                                                 type,
-                                                 payload
-                                             }) => {
+const DEFAULT_CREATE_CONFIG: CreateConfig = ({ type, payload }) => {
     if (type === "PixelChangeAction") {
         if ((payload as ActionMap["PixelChangeAction"]).diffPercent < 3) {
-            return
+            return;
         }
         return {
             key: "ArrowDown"
-        }
+        };
     } else if (type === "GestureAction") {
         return {
             key: "ArrowUp"
-        }
+        };
     }
 };
 
-const getConfig = async <T extends keyof ActionMap>({
-                                                        type,
-                                                        payload
-                                                    }: { type: T, payload: ActionMap[T] }) => {
+const getConfig = async <T extends keyof ActionMap>({ type, payload }: { type: T; payload: ActionMap[T] }) => {
     try {
         const activeWindow = await activeWin.sync();
         if (!activeWindow) {
@@ -55,7 +50,8 @@ const getConfig = async <T extends keyof ActionMap>({
             return;
         }
         const userConfigPath = getUserConfigFile();
-        const userConfig: CreateConfig = typeof userConfigPath === "string" ? eval(`require("${userConfigPath}")`) : DEFAULT_CREATE_CONFIG;
+        const userConfig: CreateConfig =
+            typeof userConfigPath === "string" ? eval(`require("${userConfigPath}")`) : DEFAULT_CREATE_CONFIG;
         if (!userConfig) {
             return;
         }
@@ -70,7 +66,7 @@ const getConfig = async <T extends keyof ActionMap>({
         console.error(error);
         return null;
     }
-}
+};
 const createWindow = (): void => {
     // Create the browser window.
     const mainWindow = new BrowserWindow({
@@ -78,8 +74,8 @@ const createWindow = (): void => {
         width: 1024,
         webPreferences: {
             preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
-            contextIsolation: true,
-        },
+            contextIsolation: true
+        }
     });
 
     // and load the index.html of the app.
@@ -88,12 +84,12 @@ const createWindow = (): void => {
 
     // Open the DevTools.
     mainWindow.webContents.openDevTools();
-    let prevTimeMs = Date.now()
+    let prevTimeMs = Date.now();
     let waitTimeMs = 1_000; // 1sec
     onMessage("PixelChangeAction", async (data) => {
         const currentTimeMs = Date.now();
         if (currentTimeMs - prevTimeMs < waitTimeMs) {
-            console.info("Skip by waiting: PixelChangeAction", data)
+            console.info("Skip by waiting: PixelChangeAction", data);
             return;
         }
         prevTimeMs = currentTimeMs;
@@ -116,11 +112,11 @@ const createWindow = (): void => {
         console.info("GestureAction", data);
         const currentTimeMs = Date.now();
         if (currentTimeMs - prevTimeMs < waitTimeMs) {
-            console.info("Skip by waiting: GestureAction", data)
+            console.info("Skip by waiting: GestureAction", data);
             return;
         }
         prevTimeMs = currentTimeMs;
-        console.info("GestureAction", data)
+        console.info("GestureAction", data);
         const config = await getConfig({
             type: "GestureAction",
             payload: data
@@ -139,18 +135,18 @@ const createWindow = (): void => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow);
+app.on("ready", createWindow);
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
-app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
+app.on("window-all-closed", () => {
+    if (process.platform !== "darwin") {
         app.quit();
     }
 });
 
-app.on('activate', () => {
+app.on("activate", () => {
     // On OS X it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) {

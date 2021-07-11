@@ -11,15 +11,15 @@ export class ContextBridgeApi {
         return ipcRenderer.invoke(key, data);
     };
 
-    public onSendToRenderer = <T extends keyof ActionMap>(type: T, handler: (event: IpcRendererEvent, data: ActionMap[T]) => unknown) => {
-        return ipcRenderer.on(type, handler)
+    public onSendToRenderer = <T extends keyof ActionMap>(
+        type: T,
+        handler: (event: IpcRendererEvent, data: ActionMap[T]) => unknown
+    ) => {
+        return ipcRenderer.on(type, handler);
     };
 }
 
 /**
  * contextBridgeにAPIを登録する。
  */
-contextBridge.exposeInMainWorld(
-    API_KEY,
-    new ContextBridgeApi()
-);
+contextBridge.exposeInMainWorld(API_KEY, new ContextBridgeApi());

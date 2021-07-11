@@ -11,33 +11,30 @@ const VIDEO_CONFIG = {
 };
 const getDevices = async (): Promise<MediaDeviceInfo[]> => {
     const devices = await navigator.mediaDevices.enumerateDevices();
-    const videoDevices = devices.filter(deviceInfo => deviceInfo.kind == "videoinput");
+    const videoDevices = devices.filter((deviceInfo) => deviceInfo.kind == "videoinput");
     if (videoDevices.length < 1) {
         alert("Not found video devices");
         throw new Error("Not found video devices");
     }
     return videoDevices;
-}
+};
 const getMediaStream = (deviceId: string) => {
     return navigator.mediaDevices.getUserMedia({
         audio: false,
         video: {
             ...VIDEO_CONFIG.video,
-            deviceId: deviceId,
-        },
+            deviceId: deviceId
+        }
     });
-}
+};
 const messageName = "zero-timeout-message";
 // configure gesture estimator
 // add "✌️" and "👍" as sample gestures
-const knownGestures = [
-    fp.Gestures.VictoryGesture,
-    fp.Gestures.ThumbsUpGesture
-];
+const knownGestures = [fp.Gestures.VictoryGesture, fp.Gestures.ThumbsUpGesture];
 const GE = new fp.GestureEstimator(knownGestures);
 const gestureStrings = {
-    'thumbs_up': '👍',
-    'victory': '✌️'
+    thumbs_up: "👍",
+    victory: "✌️"
 };
 export type GestureDetectionType = "👍" | "✌️";
 const estimateHands = async (video: HTMLVideoElement): Promise<GestureDetectionType | null> => {
@@ -53,10 +50,10 @@ const estimateHands = async (video: HTMLVideoElement): Promise<GestureDetectionT
         if (est.gestures.length > 0) {
             // find gesture with highest confidence
             const result = est.gestures.reduce((p: any, c: any) => {
-                return (p.confidence > c.confidence) ? p : c;
+                return p.confidence > c.confidence ? p : c;
             });
             // @ts-expect-error no type
-            return gestureStrings[result.name] as GestureKeys
+            return gestureStrings[result.name] as GestureKeys;
         }
     }
     return null;
@@ -67,7 +64,7 @@ const setZeroTimeout = (function (global) {
 
     const clear = () => {
         handlers.length = 0;
-    }
+    };
 
     function handleMessage(event: MessageEvent) {
         if (event.source == global && event.data == messageName) {
@@ -85,8 +82,8 @@ const setZeroTimeout = (function (global) {
         handlers.push(handler);
         global.postMessage(messageName, "*");
         return () => clear();
-    }
-}(window));
+    };
+})(window);
 const diffMemory: number[] = [];
 
 const median = (sortedNumbers: number[]) => {
@@ -97,23 +94,22 @@ const median = (sortedNumbers: number[]) => {
 export type onPixelChangeHandler = (props: { diffPixelCount: number; diffPercent: number }) => void;
 export type onGestureHandler = (props: { type: GestureDetectionType }) => void;
 export const useMotion = ({
-                              canvasRef,
-                              poseCanvasRef,
-                              videoRef,
-                              onChange,
-                              onGesture,
-                              intervalMs = 500,
-                              minimalDiff = 500
-                          }: {
-    canvasRef: MutableRefObject<HTMLCanvasElement | null>
-    poseCanvasRef: MutableRefObject<HTMLCanvasElement | null>
+    canvasRef,
+    poseCanvasRef,
+    videoRef,
+    onChange,
+    onGesture,
+    intervalMs = 500,
+    minimalDiff = 500
+}: {
+    canvasRef: MutableRefObject<HTMLCanvasElement | null>;
+    poseCanvasRef: MutableRefObject<HTMLCanvasElement | null>;
     videoRef: MutableRefObject<HTMLVideoElement | null>;
     onChange: onPixelChangeHandler;
     onGesture: onGestureHandler;
     intervalMs?: number;
     minimalDiff?: number;
 }) => {
-
     useEffect(() => {
         const offscreen = canvasRef.current;
         if (!offscreen) {
@@ -143,15 +139,15 @@ export const useMotion = ({
         let prev = performance.now();
         const tick = () => {
             const current = performance.now();
-            if ((current - prev) < intervalMs) {
+            if (current - prev < intervalMs) {
                 clearTimeout = setZeroTimeout(() => tick());
                 return;
             }
             prev = current;
             // gesture detection
-            estimateHands(videoElement).then(result => {
+            estimateHands(videoElement).then((result) => {
                 if (result) {
-                    onGesture({ type: result })
+                    onGesture({ type: result });
                 }
             });
             // get diffs
@@ -170,7 +166,7 @@ export const useMotion = ({
             const diffPercent = (diffPixelCount / newImage.data.length) * 100;
             onChange({
                 diffPixelCount: medianDiff,
-                diffPercent,
+                diffPercent
             });
             // reset
             diffMemory.length = 0;
@@ -182,7 +178,7 @@ export const useMotion = ({
         }
         // https://w3c.github.io/uievents/tools/key-event-viewer.html
         return () => {
-            videoElement.removeEventListener("loadedmetadata", onloadmetadata)
+            videoElement.removeEventListener("loadedmetadata", onloadmetadata);
             clearTimeout && clearTimeout();
         };
     }, [canvasRef, intervalMs, minimalDiff, onChange, poseCanvasRef, videoRef]);
@@ -196,14 +192,14 @@ export const useMotionVideo = ({ videoRef }: { videoRef: MutableRefObject<HTMLVi
         (async function inEffect() {
             const devices = await getDevices();
             setDevices(devices);
-        })()
+        })();
     }, []);
     useEffect(() => {
         (async function inEffect() {
             if (!selectedDeviceId) {
                 setSelectedDeviceId(devices[0].deviceId);
             }
-        })()
+        })();
     }, [devices, selectedDeviceId, setSelectedDeviceId]);
     useEffect(() => {
         (async function inEffect() {
@@ -213,7 +209,7 @@ export const useMotionVideo = ({ videoRef }: { videoRef: MutableRefObject<HTMLVi
             }
             const mediaStream = await getMediaStream(selectedDeviceId);
             setMediaStream(mediaStream);
-        })()
+        })();
     }, [selectedDeviceId]);
     useEffect(() => {
         const videoElement = videoRef.current;
@@ -222,15 +218,18 @@ export const useMotionVideo = ({ videoRef }: { videoRef: MutableRefObject<HTMLVi
             videoElement.play();
         }
     }, [mediaStream, videoRef]);
-    const handleSelectDevice = useCallback((deviceId: string) => {
-        setSelectedDeviceId(deviceId);
-    }, [setSelectedDeviceId]);
+    const handleSelectDevice = useCallback(
+        (deviceId: string) => {
+            setSelectedDeviceId(deviceId);
+        },
+        [setSelectedDeviceId]
+    );
     return [{ videoRef, selectedDeviceId, devices }, { handleSelectDevice }] as const;
-}
+};
 export type MotionVideoProps = {
     onChange: onPixelChangeHandler;
     onGesture: onGestureHandler;
-}
+};
 export const MotionVideo = (props: MotionVideoProps) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const poseCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -241,25 +240,23 @@ export const MotionVideo = (props: MotionVideoProps) => {
         poseCanvasRef,
         onChange: props.onChange,
         onGesture: props.onGesture
-    })
+    });
     const [{ devices, selectedDeviceId }, { handleSelectDevice }] = useMotionVideo({ videoRef });
-    return <div>
-        <Listbox value={selectedDeviceId} onChange={handleSelectDevice}>
-            <Listbox.Button>{"device"}</Listbox.Button>
-            <Listbox.Options>
-                {devices?.map((device) => (
-                    <Listbox.Option
-                        key={device.deviceId}
-                        value={device.deviceId}
-                    >
-                        {device.label}
-                    </Listbox.Option>
-                ))}
-            </Listbox.Options>
-        </Listbox>
-        <video ref={videoRef} width={VIDEO_CONFIG.video.width} height={VIDEO_CONFIG.video.height}>
-        </video>
-        <canvas ref={canvasRef} hidden={true}/>
-        <canvas ref={poseCanvasRef} hidden={true}/>
-    </div>
-}
+    return (
+        <div>
+            <Listbox value={selectedDeviceId} onChange={handleSelectDevice}>
+                <Listbox.Button>{"device"}</Listbox.Button>
+                <Listbox.Options>
+                    {devices?.map((device) => (
+                        <Listbox.Option key={device.deviceId} value={device.deviceId}>
+                            {device.label}
+                        </Listbox.Option>
+                    ))}
+                </Listbox.Options>
+            </Listbox>
+            <video ref={videoRef} width={VIDEO_CONFIG.video.width} height={VIDEO_CONFIG.video.height}></video>
+            <canvas ref={canvasRef} hidden={true} />
+            <canvas ref={poseCanvasRef} hidden={true} />
+        </div>
+    );
+};

@@ -8,7 +8,6 @@ export type ModifierOption = {
     command?: boolean;
 };
 
-
 function createModifier(modifierOption: ModifierOption) {
     const modifiers = [];
     if (modifierOption.shift) {
@@ -22,33 +21,36 @@ function createModifier(modifierOption: ModifierOption) {
     }
     if (modifierOption.option) {
         modifiers.push("option down");
-
     }
     return modifiers;
 }
 
 export function sendKeyStroke(key: string, modifierOption: ModifierOption) {
     const modifiers = createModifier(modifierOption);
-    return run((key, modifiers) => {
-        const SystemEvents = Application("System Events");
-        const app = Application.currentApplication();
-        app.includeStandardAdditions = true;
-        /*
+    return run(
+        (key, modifiers) => {
+            const SystemEvents = Application("System Events");
+            const app = Application.currentApplication();
+            app.includeStandardAdditions = true;
+            /*
         key code 123 -- left arrow
         key code 124 -- right arrow
         key code 125 -- down arrow
         key code 126 -- up arrow
          */
-        if (key === "ArrowLeft") {
-            SystemEvents.keyCode(123, { using: modifiers });
-        } else if (key === "ArrowRight") {
-            SystemEvents.keyCode(124, { using: modifiers });
-        } else if (key === "ArrowDown") {
-            SystemEvents.keyCode(125, { using: modifiers });
-        } else if (key === "ArrowUp") {
-            SystemEvents.keyCode(126, { using: modifiers });
-        } else {
-            SystemEvents.keystroke(key, { using: modifiers });
-        }
-    }, key, modifiers);
+            if (key === "ArrowLeft") {
+                SystemEvents.keyCode(123, { using: modifiers });
+            } else if (key === "ArrowRight") {
+                SystemEvents.keyCode(124, { using: modifiers });
+            } else if (key === "ArrowDown") {
+                SystemEvents.keyCode(125, { using: modifiers });
+            } else if (key === "ArrowUp") {
+                SystemEvents.keyCode(126, { using: modifiers });
+            } else {
+                SystemEvents.keystroke(key, { using: modifiers });
+            }
+        },
+        key,
+        modifiers
+    );
 }

@@ -14,6 +14,6 @@ export type UserConfigCreatorArgs<T extends keyof ActionMap> = {
     payload: ActionMap[T];
     app: Electron.App;
     path: typeof path;
-    activeWindow?: activeWin.Result
+    activeWindow?: activeWin.Result;
 };
 export type CreateConfig = <T extends keyof ActionMap>(args: UserConfigCreatorArgs<T>) => UserConfig | undefined;
