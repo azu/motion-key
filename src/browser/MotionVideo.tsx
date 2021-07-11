@@ -1,5 +1,5 @@
 import { Listbox } from "@headlessui/react";
-import React, { MutableRefObject, RefObject, useCallback, useEffect, useRef, useState } from "react";
+import React, { MutableRefObject, useCallback, useEffect, useRef, useState } from "react";
 import { useLocalStorage } from "react-use-storage";
 import pixelmatch from "pixelmatch";
 // @ts-expect-error no type
