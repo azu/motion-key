@@ -20,7 +20,7 @@ jobs:
           yarn install
       - name: Publish
         run: |
-          yarn run dist
+          yarn run package
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Cleanup artifacts
