@@ -15,10 +15,28 @@ A keyboard configuration for your motion.
 - Support gesture like 👍 ✌️
 - Configuration by JavaScript `~/.config/motion-key/motion-key.config.js`
 
-## Usage
+## Installation
 
-    yarn install
-    yarn start
+> https://github.com/azu/motion-key/releases/latest
+
+1. Download a binary from [the latest releases](https://github.com/azu/motion-key/releases/latest)
+2. Install app
+
+:warning: This app is not signed. So, OS show warning about it.
+
+Additional installation steps on macOS:
+
+1. Select `motion-key.app`
+2. Open context menu and Click "Open"
+
+:warning: require permission on macOS.
+Open the app, and you need to add permission for `motion-key.app`
+
+- **Accessibility**
+  - use accessibility permission to get `activeWindow` object
+  - `activeWindow` includes active app info like bundle.id, url, title.
+- **Screen Recording**
+  - use Screen Recording permission to use web camera
 
 ## Config
 
