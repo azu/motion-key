@@ -25,16 +25,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Cleanup artifacts
         run: |
-          npx del-cli "dist/!(*.exe|*.deb|*.AppImage|*.dmg)"
+          npx del-cli "out/!(*.exe|*.deb|*.AppImage|*.dmg)"
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.os }}
-          path: dist
+          path: out
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: "dist/**"
+          files: "out/**"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
