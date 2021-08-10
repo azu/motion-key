@@ -155,6 +155,11 @@ module.exports = ({ type, activeWindow, payload }) => {
 }
 ```
 
+## Releases
+
+    npm version {patch,minor,major}
+    git push --tags
+
 ## Contributing
 
 1. Fork it!
