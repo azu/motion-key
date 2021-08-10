@@ -1,40 +1,20 @@
-name: release
-
-on: [push]
-
+name: Release
+on:
+  release:
+    types:
+      - created
+# https://dev.to/erikhofer/build-and-publish-a-multi-platform-electron-app-on-github-3lnd
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [macOS-latest]
-
+  publish_on_mac:
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js
-        uses: actions/setup-node@v2
+      - uses: actions/setup-node@master
         with:
-          node-version: 14.x
-      - name: yarn install
-        run: |
-          yarn install
-      - name: Publish
-        run: |
-          yarn run package
+          node-version: 14
+      - name: install dependencies
+        run: npm install
+      - name: publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Cleanup artifacts
-        run: |
-          npx del-cli "out/!(*.exe|*.deb|*.AppImage|*.dmg)"
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ matrix.os }}
-          path: out
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          files: "out/**"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run publish
